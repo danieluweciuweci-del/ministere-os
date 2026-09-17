@@ -573,7 +573,7 @@ function seedDemo() {
   state.members.push({id:uid('member'),name:'Membre exemple',phone:'',group:'Général',status:'Actif',createdAt:new Date().toISOString()});
   const assignments = [
     {id:uid('assign'),role:'Orateur',workerId:workers[0].id,workerName:workers[0].name,response:'pending'},
-    {id:uid('assign'),role:'Modérateur',workerId:workers[0].id,workerName:workers[1].name,response:'pending'}
+    {id:uid('assign'),role:'Modérateur',workerId:workers[0].id,workerName:workers[0].name,response:'pending'}
   ];
   state.activities.push({id:uid('activity'),name:'Culte de démonstration',date,time:'15:00',place:'Salle principale',assignments,createdAt:new Date().toISOString()});
   save(KEYS.workers,state.workers); save(KEYS.members,state.members); save(KEYS.activities,state.activities);
