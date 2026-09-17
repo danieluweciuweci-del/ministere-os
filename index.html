@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ministère OS — plateforme de gestion du ministère">
+  <title>Ministère OS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="login-screen" id="loginScreen" aria-hidden="true">
+    <div class="login-card">
+      <div class="brand-mark large">M</div>
+      <p class="eyebrow">MINISTÈRE OS</p>
+      <h2>Connexion sécurisée</h2>
+      <p class="login-subtitle">Connectez-vous avec votre compte pour accéder uniquement aux espaces autorisés.</p>
+      <form id="loginForm" class="form-panel">
+        <label>Identifiant<input id="loginUsername" autocomplete="username" required></label>
+        <label>Mot de passe<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        <button class="btn btn-primary" type="submit">Se connecter</button>
+        <p id="loginError" class="login-error"></p>
+      </form>
+      <small class="login-note">Version de démonstration locale : les comptes sont stockés dans le navigateur. Une vraie sécurité multi-utilisateurs nécessitera un backend.</small>
+    </div>
+  </div>
+
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">M</div>
+        <div>
+          <strong>Ministère OS</strong>
+          <span>Centre de contrôle</span>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="Navigation principale">
+        <button class="nav-btn active" data-page="dashboard">⌂ <span>Tableau de bord</span></button>
+        <button class="nav-btn" data-page="membres">♙ <span>Membres</span></button>
+        <button class="nav-btn" data-page="ouvriers">♟ <span>Ouvriers</span></button>
+        <button class="nav-btn" data-page="activites">◷ <span>Activités</span></button>
+        <button class="nav-btn finance-only" data-page="contributions">▣ <span>Contributions</span></button>
+        <button class="nav-btn" data-page="notifications">♢ <span>Notifications</span><b class="nav-badge" id="navNotificationCount">0</b></button>
+        <button class="nav-btn" data-page="communication">✉ <span>Communication</span></button>
+        <button class="nav-btn" data-page="direct">▶ <span>Direct</span></button>
+        <button class="nav-btn" data-page="statistiques">▥ <span>Statistiques</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status"><i></i> Système local actif</div>
+        <small>V1 — HTML / CSS / JavaScript</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Ouvrir le menu">☰</button>
+        <div>
+          <p class="eyebrow">MINISTÈRE OS</p>
+          <h1 id="pageTitle">Tableau de bord</h1>
+        </div>
+        <div class="user-box"><span id="currentUserName">—</span><small id="currentUserRole">—</small><button class="btn btn-secondary btn-small" id="logoutBtn">Déconnexion</button></div><button class="notification-bell" id="notificationBell" aria-label="Notifications">
+          ♢ <span id="topNotificationCount">0</span>
+        </button>
+      </header>
+
+      <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+      <section class="page active" id="page-dashboard">
+        <div class="welcome-card">
+          <div>
+            <span class="pill">CENTRE DE CONTRÔLE</span>
+            <h2>Bienvenue dans votre espace de gestion.</h2>
+            <p>Gérez les membres, les ouvriers, les activités, les contributions, la communication et les directs depuis un seul endroit.</p>
+          </div>
+          <div class="welcome-date" id="currentDate"></div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card"><span>Membres</span><strong id="dashMembers">0</strong><small>Total enregistré</small></article>
+          <article class="stat-card"><span>Ouvriers</span><strong id="dashWorkers">0</strong><small>Serviteurs actifs</small></article>
+          <article class="stat-card"><span>Activités</span><strong id="dashActivities">0</strong><small>Programmées</small></article>
+          <article class="stat-card finance-only"><span>Contributions</span><strong id="dashContributions">0 FC · 0 $</strong><small>Total confirmé</small></article>
+        </div>
+
+        <div class="two-columns">
+          <article class="panel">
+            <div class="panel-head"><div><h3>Prochaines activités</h3><p>Les prochains rendez-vous du ministère</p></div><button class="btn btn-secondary" data-page="activites">Voir tout</button></div>
+            <div id="upcomingActivities" class="activity-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><h3>Notifications récentes</h3><p>Dernières informations du système</p></div><button class="btn btn-secondary" data-page="notifications">Ouvrir</button></div>
+            <div id="recentNotifications" class="notification-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="page-membres">
+        <div class="page-head"><div><p class="eyebrow">COMMUNAUTÉ</p><h2>Gestion des membres</h2><p>Enregistrez et recherchez les membres du ministère.</p></div><button class="btn btn-primary" id="openMemberModal">+ Nouveau membre</button></div>
+        <div class="toolbar"><input id="memberSearch" class="search" type="search" placeholder="Rechercher par nom, téléphone ou groupe..."></div>
+        <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Groupe</th><th>Statut</th><th>Inscription</th><th>Actions</th></tr></thead><tbody id="membersTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-ouvriers">
+        <div class="page-head"><div><p class="eyebrow">ÉQUIPE</p><h2>Ouvriers</h2><p>Suivez les responsabilités et les absences.</p></div><button class="btn btn-primary" id="openWorkerModal">+ Nouvel ouvrier</button></div>
+        <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Fonction</th><th>Téléphone</th><th>Absences</th><th>État</th><th>Actions</th></tr></thead><tbody id="workersTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-activites">
+        <div class="page-head"><div><p class="eyebrow">PROGRAMMATION</p><h2>Activités</h2><p>Programmez les cultes et affectez les personnes avec notification personnelle.</p></div><button class="btn btn-primary" id="openActivityModal">+ Programmer une activité</button></div>
+        <div id="activitiesGrid" class="cards-grid"></div>
+      </section>
+
+      <section class="page" id="page-contributions">
+        <div class="page-head"><div><p class="eyebrow">FINANCES</p><h2>Contributions</h2><p>Enregistrez les contributions à distance et générez un reçu à jour.</p></div><button class="btn btn-primary" id="openContributionModal">+ Nouvelle contribution</button></div>
+        <div class="finance-summary"><div><span>Confirmé</span><strong id="confirmedTotal">0 FC · 0 $</strong></div><div><span>En attente</span><strong id="pendingTotal">0 FC · 0 $</strong></div><div><span>Contributions</span><strong id="contributionCount">0</strong></div></div>
+        <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Contributeur</th><th>Téléphone</th><th>Montant</th><th>Référence</th><th>Statut</th><th>Reçu</th><th>Actions</th></tr></thead><tbody id="contributionsTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-notifications">
+        <div class="page-head"><div><p class="eyebrow">CENTRE D’ALERTES</p><h2>Notifications</h2><p>Les programmations personnelles, rappels et informations de diffusion.</p></div><button class="btn btn-secondary" id="markAllRead">Tout marquer comme lu</button></div>
+        <div id="notificationsPage" class="notification-list large"></div>
+      </section>
+
+      <section class="page" id="page-communication">
+        <div class="page-head"><div><p class="eyebrow">COMMUNICATION</p><h2>Communiqués</h2><p>Préparez les annonces destinées à la communauté.</p></div></div>
+        <div class="two-columns">
+          <form class="panel form-panel" id="announcementForm">
+            <h3>Nouvelle annonce</h3>
+            <label>Titre<input id="announcementTitle" required maxlength="100"></label>
+            <label>Message<textarea id="announcementMessage" required rows="6" maxlength="1000"></textarea></label>
+            <label>Type<select id="announcementType"><option value="general">Général</option><option value="culte">Culte</option><option value="priere">Prière</option><option value="important">Important</option></select></label>
+            <button class="btn btn-primary" type="submit">Publier l’annonce</button>
+          </form>
+          <article class="panel"><div class="panel-head"><div><h3>Annonces publiées</h3><p>Historique local</p></div></div><div id="announcementsList" class="announcement-list"></div></article>
+        </div>
+      </section>
+
+      <section class="page" id="page-direct">
+        <div class="page-head"><div><p class="eyebrow">DIFFUSION</p><h2>Direct</h2><p>Lancez une diffusion et envoyez le lien aux destinataires.</p></div></div>
+        <div class="two-columns">
+          <form class="panel form-panel" id="liveForm">
+            <h3>Paramètres du direct</h3>
+            <label>Plateforme<select id="livePlatform"><option value="Facebook">Facebook</option><option value="YouTube">YouTube</option><option value="TikTok">TikTok</option></select></label>
+            <label>Lien du direct<input id="liveUrl" type="url" placeholder="https://..." required></label>
+            <label>Titre du direct<input id="liveTitle" maxlength="120" placeholder="Culte en direct"></label>
+            <button class="btn btn-primary" type="submit" id="launchLiveBtn">▶ Lancer le direct</button>
+          </form>
+          <article class="panel live-panel"><div class="live-status"><i id="liveDot"></i><strong id="liveStatusText">Hors ligne</strong></div><h3 id="liveTitleDisplay">Aucun direct en cours</h3><p id="livePlatformDisplay">—</p><a id="liveLink" class="btn btn-secondary disabled" href="#" target="_blank" rel="noopener">Ouvrir le lien</a><button class="btn btn-danger" id="stopLiveBtn">Arrêter le direct</button></article>
+        </div>
+      </section>
+
+      <section class="page" id="page-statistiques">
+        <div class="page-head"><div><p class="eyebrow">ANALYSE</p><h2>Statistiques</h2><p>Une vue globale de l’activité du ministère.</p></div></div>
+        <div class="stats-grid"><article class="stat-card"><span>Membres actifs</span><strong id="statActiveMembers">0</strong></article><article class="stat-card"><span>Ouvriers</span><strong id="statWorkers">0</strong></article><article class="stat-card"><span>Activités terminées</span><strong id="statCompletedActivities">0</strong></article><article class="stat-card"><span>Notifications non lues</span><strong id="statUnread">0</strong></article></div>
+        <div class="two-columns"><article class="panel"><div class="panel-head"><div><h3>Activités par mois</h3><p>Répartition des activités enregistrées</p></div></div><div id="monthlyStats" class="bar-chart"></div></article><article class="panel"><div class="panel-head"><div><h3>Suivi des absences</h3><p>Ouvriers nécessitant une attention</p></div></div><div id="absenceStats" class="absence-list"></div></article></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Member modal -->
+  <div class="modal" id="memberModal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">MEMBRE</p><h3>Nouveau membre</h3></div><button class="modal-close" data-close="memberModal">×</button></div><form id="memberForm" class="form-panel"><label>Nom complet<input id="memberName" required maxlength="100"></label><label>Téléphone<input id="memberPhone" maxlength="30"></label><label>Groupe / département<input id="memberGroup" maxlength="80" placeholder="Jeunesse, Média, etc."></label><label>Statut<select id="memberStatus"><option value="Actif">Actif</option><option value="Nouveau">Nouveau</option><option value="Inactif">Inactif</option></select></label><div class="form-actions"><button type="button" class="btn btn-secondary" data-close="memberModal">Annuler</button><button type="submit" class="btn btn-primary">Enregistrer</button></div></form></div></div>
+
+  <!-- Worker modal -->
+  <div class="modal" id="workerModal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">ÉQUIPE</p><h3>Nouvel ouvrier</h3></div><button class="modal-close" data-close="workerModal">×</button></div><form id="workerForm" class="form-panel"><label>Nom complet<input id="workerName" required maxlength="100"></label><label>Fonction<input id="workerRole" required maxlength="80" placeholder="Modérateur, Interprète, Orateur..."></label><label>Téléphone<input id="workerPhone" maxlength="30"></label><div class="form-actions"><button type="button" class="btn btn-secondary" data-close="workerModal">Annuler</button><button type="submit" class="btn btn-primary">Enregistrer</button></div></form></div></div>
+
+  <!-- Activity modal -->
+  <div class="modal" id="activityModal" aria-hidden="true"><div class="modal-card wide"><div class="modal-head"><div><p class="eyebrow">PROGRAMMATION</p><h3>Programmer une activité</h3></div><button class="modal-close" data-close="activityModal">×</button></div><form id="activityForm" class="form-panel"><div class="form-grid"><label>Nom de l’activité<input id="activityName" required maxlength="120" placeholder="Culte, nuit de prière..."></label><label>Date<input id="activityDate" type="date" required></label><label>Heure<input id="activityTime" type="time" required></label><label>Lieu<input id="activityPlace" maxlength="120" placeholder="MGJ Bunia / Google Meet"></label><label>Orateur<select id="activitySpeaker"><option value="">Non défini</option></select></label><label>Modérateur<select id="activityModerator"><option value="">Non défini</option></select></label><label>Interprète<select id="activityInterpreter"><option value="">Non défini</option></select></label></div><div class="form-actions"><button type="button" class="btn btn-secondary" data-close="activityModal">Annuler</button><button type="submit" class="btn btn-primary">Programmer et notifier</button></div></form></div></div>
+
+  <!-- Contribution modal -->
+  <div class="modal" id="contributionModal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">FINANCES</p><h3>Nouvelle contribution</h3></div><button class="modal-close" data-close="contributionModal">×</button></div><form id="contributionForm" class="form-panel"><label>Nom du contributeur<input id="contributorName" required maxlength="100"></label><label>Téléphone / M-Pesa / Airtel Money<input id="contributorPhone" required maxlength="30"></label><div class="form-grid"><label>Montant<input id="contributionAmount" type="number" min="1" step="1" required></label><label>Devise<select id="contributionCurrency"><option value="CDF">CDF (FC)</option><option value="USD">USD ($)</option></select></label></div><label>Référence de transaction<input id="contributionReference" required maxlength="80" placeholder="Ex. MPESA-123456"></label><label>Motif<select id="contributionPurpose"><option value="Offrande">Offrande</option><option value="Dîme">Dîme</option><option value="Don">Don</option><option value="Projet">Projet</option><option value="Autre">Autre</option></select></label><div class="form-actions"><button type="button" class="btn btn-secondary" data-close="contributionModal">Annuler</button><button type="submit" class="btn btn-primary">Enregistrer</button></div></form></div></div>
+
+  <!-- Receipt modal -->
+  <div class="modal" id="receiptModal" aria-hidden="true"><div class="modal-card receipt-card"><div class="modal-head no-print"><div><p class="eyebrow">DOCUMENT</p><h3>Reçu de contribution</h3></div><button class="modal-close" data-close="receiptModal">×</button></div><div id="receiptContent"></div><div class="form-actions no-print"><button class="btn btn-secondary" data-close="receiptModal">Fermer</button><button class="btn btn-primary" id="printReceipt">Imprimer / PDF</button></div></div></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
